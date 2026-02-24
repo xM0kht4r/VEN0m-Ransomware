@@ -34,7 +34,7 @@ This project demonstartes how a legit, and signed driver can be weponized to eva
 #
 ## Key Features
 
-### 🔥 AV/EDR Evasion:
+### AV/EDR Evasion:
 VEN0m employs the classic BYOVD technique, but unlike the [AV-EDR-KILLER](https://github.com/xM0kht4r/AV-EDR-Killer), which exploits a vulnerable driver that exposes the kernel function `ZwTerminateProcess` to unprivileged users, it leverages a vulnerable driver included in  `IObit Malware Fighter v12.1.0` which is kinda ironic since we are using it for evasion.
 
 The driver in question here is `IMFForceDelete.sys`, which exposes an IOCTL that allows unprivileged users to arbitrary delete files. This vulnerability is tracked as `CVE-2025-26125`, and the driver is still not on Microsoft’s blocklist.
@@ -58,7 +58,7 @@ We simply shred the installation folders and the executables on disk. As simple 
 
 This seems like a blind spot for most defense products, since we are targeting files on disk instead of manipulating the memory or making suspicious calls. Using our IMFForceDelete.sys driver, we can force delete locked files with high privileges. Directly attacking an AV or EDR product sounds counterintuitive, as attackers typically aim for stealth to bypass defenses rather than confront them.
 
-By using this technique, we corrupted the running EDR/AV processes until they were slowly broken and stopped working properly, which opened the gateway to wreak havoc and deploy our payload of choice, VEN0m ✅.
+By using this technique, we corrupted the running EDR/AV processes until they were slowly broken and stopped working properly, which opened the gateway to wreak havoc and deploy our payload of choice, VEN0m.
 
 + You can expand or adjust the list of target AV/EDR by modifying the constant **TARGETS**:
   
@@ -66,7 +66,7 @@ By using this technique, we corrupted the running EDR/AV processes until they we
 const TARGETS: &[&str] = &[r"C:\Program Files (x86)\Kaspersky Lab", r"C:\Program Files\Bitdefender", r"C:\Program Files\Bitdefender Agent", r"C:\Program Files\Windows Defender",];
 ```
 #
-### ⚡ UAC Bypass:
+### UAC Bypass:
 
 To bypass UAC prompts, we are hijacking the execution flow of a signed Microsoft binary `Slui.exe` that supports auto-elevation without triggering a prompt when invoked with the `runas` verb under an administrative context.
 
@@ -75,19 +75,19 @@ The core exploitation occurs when `Slui.exe` attempts to open a non-existent reg
 I'm not sure if this is a vulnerability that should be reported. If so, please don't hesitate to contact me via the email listed below.
 
 #
-### 📦 Driver loading:
+### Driver loading:
 
 Since VEN0m is bypassing UAC and running in High integrity, it automates the extraction of the embedded driver into the temp folder and the creation of a kernel service with disguised names such as `MicrosoftUpdate11.01`. It includes very handy checks to autostart the service if stopped or to abstain from creating it if it already exists.
 
 #
-### 🕹️ Persistence:
+### Persistence:
 
 After the host defenses are neutralized, you can choose whatever persistence technique you want. 
 I went with a simple `Winlogon Userinit` technique, which leverages the `Userinit` registry key under `HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon`. By default, this key specifies `userinit.exe` as the value, which executes upon user login to initialize the user environment. 
 However, we hijack that by appending our payload path as well separated by a comma from the legitimate `userinit.exe`,  while also dropping a copy of the malware in `%LOCALAPPDATA%`.
 
 #
-### 🧨 Encryption:
+### Encryption:
 The ransomware scans specified drives for files with targeted extensions while filtering against an exclusion list. Matching files are encrypted using a 32-byte hardcoded key, and their extensions are changed to `.vnm`.
 
 You can customize the behavior by modifying the following constants: 
@@ -111,26 +111,26 @@ const DRV: &[&str] = &["C:\\", "D:\\", "E:\\", "F:\\"];
 ```
 
 #
-### ☠️ Ransom Note:
+### Ransom Note:
 
-Upon finishing encryption, VEN0m changes the desktop wallpaper and drops an executable ransom note onto the desktop. It also registers a scheduled task that runs every couple of minutes to launch the note GUI, which displays a flashy skull.
+Upon finishing encryption, VEN0m changes the desktop wallpaper and drops an executable ransom note onto the desktop. It also registers a scheduled task that runs every couple of minutes to launch the note GUI, which displays a flashy skull ☠️.
 
 + You can customize the wallpaper by replacing `/assets/wallpaper.jpg` with your own image.
 + You can modify the scheduled task properties by editing `/src/task.rs`
   
 #
-### 🧪Decyrption tool:
+### Decyrption tool:
 
-VEN0m also includes a decryptor tool `Antid0te.exe` that scans for files with the extension `.vnm` and reverses the encryption routine using the same key specified for encryption.
+VEN0m also includes a decryptor tool `Antid0te.exe`🧪 that scans for files with the extension `.vnm` and reverses the encryption routine using the same key specified for encryption.
 
 > [!WARNING]
 It's important to save your encryption key so you can decrypt your files using the Antid0te.exe decryptor.
 
-### 🛠️ Customization :
+## Customization :
 VEN0m is highly modular and customizable. You can change the behavior of the ransomware by modifying the hardcoded constants. You can also take it to the next level by pairing it with a privilege escalation vulnerability or a lateral movement technique of your choice :)
 
 #
-### 🚀 Usage:
+## Usage:
 
 1. Place your .ico icons and your custom wallpaper inside /assets
 2. Compile the binaries:
